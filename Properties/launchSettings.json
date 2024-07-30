@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "HostingPlayground": {
+      "commandName": "Project",
+      "commandLineArgs": "--name Mike"
+    }
+  }
+}
