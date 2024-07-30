@@ -8,9 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\System.CommandLine.Hosting\System.CommandLine.Hosting.csproj" />
-    <ProjectReference Include="..\..\src\System.CommandLine.NamingConventionBinder\System.CommandLine.NamingConventionBinder.csproj" />
-    <ProjectReference Include="..\..\src\System.CommandLine\System.CommandLine.csproj" />
+    <PackageReference Include="System.CommandLine.Hosting" Version="0.4.0-alpha.22272.1" />
   </ItemGroup>
 
 </Project>
