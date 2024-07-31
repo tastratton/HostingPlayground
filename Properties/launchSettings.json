@@ -2,7 +2,11 @@
   "profiles": {
     "HostingPlayground": {
       "commandName": "Project",
-      "commandLineArgs": "--name Mike"
+      "commandLineArgs": "--name Mike"//,
+// set in environment
+//      "environmentVariables": {
+//        "DOTNET_ENVIRONMENT": "Development"
+//      }
     }
   }
 }
