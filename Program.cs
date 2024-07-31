@@ -9,24 +9,42 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using static HostingPlayground.HostingPlaygroundLogEvents;
 using System;
+using System.IO;
 using System.Collections;
+using Microsoft.Extensions.Configuration;
+using System.Runtime.CompilerServices;
 
 namespace HostingPlayground;
 
 class Program
 {
-    // for dependency injection container
-    private static Func<string[], IHostBuilder> hostbuilder = args => Host.CreateDefaultBuilder(args)
-        .UseDefaultServiceProvider((context, options) => { options.ValidateScopes = true; });
 
-    private static Action<IHostBuilder> ActionConfigureHost = host =>
+    // for dependency injection container
+
+    private static Func<string[], IHostBuilder> GetBuilder = delegate (string[] args)
     {
-        host.ConfigureServices((context, services) =>
+        return Host.CreateDefaultBuilder(args)
+        .UseDefaultServiceProvider((context, options) => 
+        { 
+            options.ValidateScopes = true; 
+        })
+        .ConfigureHostConfiguration(hostConfig =>
+        {
+            hostConfig.SetBasePath(Directory.GetCurrentDirectory());
+            //hostConfig.AddJsonFile("hostsettings.json", optional: true);
+            //hostConfig.AddEnvironmentVariables(prefix: "PREFIX_");
+            //hostConfig.AddCommandLine(args);
+        });
+    };
+
+    private static Action<IHostBuilder> ActionConfigureHost = delegate (IHostBuilder builder)
+    {
+        builder.ConfigureServices((context, services) =>
         {
             services.AddSingleton<IGreeter, Greeter>();
         });
     };
-
+    
     // command line
     static async Task Main(string[] args)
     {
@@ -37,13 +55,19 @@ class Program
             Console.WriteLine("  {0} = {1}", de.Key, de.Value);
         };
         */
-        
-        
+        IHostBuilder hostbuilder = GetBuilder(args);
+        //IHost host = hostbuilder.Build();
+        //host.Services
+
+        // using (IHost host = hostbuilder.Build()) -- not needed with system.commandline: CommandLineBuilder.UseHost method implements using
+        //{
         await BuildCommandLine()
-        .UseHost(args => hostbuilder(args), ActionConfigureHost)
+        .UseHost(args => hostbuilder, ActionConfigureHost)
         .UseDefaults()
         .Build()
         .InvokeAsync(args);
+        //}
+       
     }
 
     private static CommandLineBuilder BuildCommandLine()
@@ -67,6 +91,7 @@ class Program
         var name = options.Name;
         logger.LogInformation(GreetEvent, "Greeting was requested for: {name}", name);
         greeter.Greet(name);
+        //Console.WriteLine(host.Services.GetService<ILoggerFactory>());
     }
 
 }
