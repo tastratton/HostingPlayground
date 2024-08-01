@@ -23,7 +23,7 @@ class Program
 
     // for dependency injection container
     // TODO: move project
-    private static Func<string[], IHostBuilder> GetBuilder = delegate (string[] args)
+    private static Func<string[], IHostBuilder> GetHostBuilder = delegate (string[] args)
     {
         return Host.CreateDefaultBuilder(args)
         .UseDefaultServiceProvider((context, options) =>
@@ -66,6 +66,7 @@ class Program
     };
     
     // command line
+
     static async Task<int> Main(string[] args)
     {
         // todo: parse dependency settings from json file https://stackoverflow.com/questions/65110479/how-to-get-values-from-appsettings-json-in-a-console-application-using-net-core
@@ -80,7 +81,7 @@ class Program
             Console.WriteLine("  {0} = {1}", de.Key, de.Value);
         };
         */
-        IHostBuilder hostbuilder = GetBuilder(args);
+        IHostBuilder hostbuilder = GetHostBuilder(args);
 
         //IHost host = hostbuilder.Build();
         //host.Services
