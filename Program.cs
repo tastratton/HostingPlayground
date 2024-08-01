@@ -26,11 +26,10 @@ class Program
 {
     static async Task<int> Main(string[] args)
     {
-        // check if environment is set anywhere
-        // start with just quick configuration data from environment mainly to get DOTNET_ENVIRONMENT
+        // get DOTNET_ENVIRONMENT... environment variables and commandline only first
         var configBuilder = new ConfigurationBuilder();
         var configRoot = configBuilder
-            .AddEnvironmentVariables("DOTNET_")
+            .AddEnvironmentVariables() //"DOTNET_"
             .AddCommandLine(args)
             .Build();
         String EnvironmentName = configRoot["ENVIRONMENT"];
@@ -47,8 +46,8 @@ class Program
         configRoot = configBuilder
         .AddJsonFile(path: "appsettings.json", optional: false, reloadOnChange: false)
         .AddJsonFile(path: $"appsettings.{EnvironmentName}.json", optional: true, reloadOnChange: false)
-        //.AddEnvironmentVariables()  // << that's ALL the env vars!
-        .AddEnvironmentVariables(prefix: "DOTNET_")  // strips the DOTNET_ from the result
+        //.AddEnvironmentVariables()  // << if need ALL the env vars!
+        .AddEnvironmentVariables(prefix: "DOTNET_")  // just env vars starting with DOTNET_, strips the DOTNET_ from the result
         .AddCommandLine(args)
         .Build();
 
@@ -58,13 +57,11 @@ class Program
         }
         
         IHostBuilder hostbuilder = HostingPlayGroundCompositionRoot.GetHostBuilder(args);
-        await BuildCommandLine()
-        .UseHost(args => hostbuilder, HostingPlayGroundCompositionRoot.ActionConfigureServices)
-        .UseDefaults()
-        .Build()
-        .InvokeAsync(args);
-
-        return 0;
+        var commandLineParser = BuildCommandLine()
+            .UseHost(args => hostbuilder, HostingPlayGroundCompositionRoot.ActionConfigureServices)
+            .UseDefaults()
+            .Build();
+        return await commandLineParser.InvokeAsync(args);
 
     }
 
