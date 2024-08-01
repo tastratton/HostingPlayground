@@ -24,7 +24,7 @@ class Program
 {
 
     // for dependency injection container
-    // TODO: move project
+    /*
     private static Func<string[], IHostBuilder> GetHostBuilder = delegate (string[] args)
     {
         return Host.CreateDefaultBuilder(args)
@@ -68,7 +68,7 @@ class Program
             services.AddServices();
         });
     };
-    
+    */
     // command line
 
     static async Task<int> Main(string[] args)
@@ -85,7 +85,7 @@ class Program
             Console.WriteLine("  {0} = {1}", de.Key, de.Value);
         };
         */
-        IHostBuilder hostbuilder = GetHostBuilder(args);
+        IHostBuilder hostbuilder = HostingPlayGroundCompositionRoot.GetHostBuilder(args);
 
         //IHost host = hostbuilder.Build();
         //host.Services
@@ -93,7 +93,7 @@ class Program
         // using (IHost host = hostbuilder.Build()) -- not needed with system.commandline: CommandLineBuilder.UseHost method implements using
         //{
         await BuildCommandLine()
-        .UseHost(args => hostbuilder, ActionConfigureServices)
+        .UseHost(args => hostbuilder, HostingPlayGroundCompositionRoot.ActionConfigureServices)
         .UseDefaults()
         .Build()
         .InvokeAsync(args);
