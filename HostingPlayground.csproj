@@ -11,7 +11,7 @@
     <PackageReference Include="System.CommandLine.Hosting" Version="0.4.0-alpha.22272.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HostingPlayground.Greeter\HostingPlayground.Greeter.csproj" />
+    <ProjectReference Include="..\HostingPlayground.CompositionRoot\HostingPlayground.CompositionRoot.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.Development.json">

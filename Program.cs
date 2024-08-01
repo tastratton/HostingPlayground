@@ -15,6 +15,8 @@ using Microsoft.Extensions.Configuration;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
 using System.Linq;
+using HostingPlayground.CompositionRoot;
+
 
 namespace HostingPlayground;
 
@@ -61,7 +63,9 @@ class Program
     {
         builder.ConfigureServices((context, services) =>
         {
-            services.AddSingleton<IGreeter, Greeter>();
+            // moved to compositionroot
+            //services.AddSingleton<IGreeter, Greeter>();
+            services.AddServices();
         });
     };
     
