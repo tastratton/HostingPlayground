@@ -14,8 +14,9 @@ using System.Collections;
 using Microsoft.Extensions.Configuration;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
-using System.Linq;
+//using System.Linq;
 using HostingPlayground.CompositionRoot;
+using System.Collections.Immutable;
 
 
 namespace HostingPlayground;
@@ -32,11 +33,14 @@ class Program
         .InvokeAsync(args);
 
         IConfigurationRoot config = new ConfigurationBuilder()
-            //.AddJsonFile("appsettings.json")
-            //.AddEnvironmentVariables()
+            .AddJsonFile("appsettings.json")
+            .AddEnvironmentVariables()
             .Build();
-        foreach ((string key, string value) in config.AsEnumerable().OrderBy(item => item.Key))  //Linq
+
+        foreach ((string key, string value) in config.AsEnumerable().ToImmutableSortedDictionary())
+        {
             Console.WriteLine($"'{key}' = '{value}'");
+        }
         return 0;
     }
 
