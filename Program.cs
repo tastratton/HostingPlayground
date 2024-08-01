@@ -22,6 +22,7 @@ class Program
 {
 
     // for dependency injection container
+    // TODO: move project
     private static Func<string[], IHostBuilder> GetBuilder = delegate (string[] args)
     {
         return Host.CreateDefaultBuilder(args)
@@ -36,9 +37,9 @@ class Program
             //hostConfig.AddEnvironmentVariables(prefix: ""); // prefix: "PREFIX_"); // DOTNET_ by default already added
             ;
         })
-        .ConfigureAppConfiguration((context,appConfig) =>
+        .ConfigureAppConfiguration((hostContext,appConfig) =>
         {
-            IHostEnvironment env = context.HostingEnvironment;
+            IHostEnvironment env = hostContext.HostingEnvironment;
             Console.WriteLine($"isDevelopment: {env.IsDevelopment()}");
             appConfig.AddCommandLine(args);
         })
@@ -48,8 +49,9 @@ class Program
 
     private static Action<IHostBuilder> ActionConfigureAppConfiguration = delegate (IHostBuilder builder)
     {
-        builder.ConfigureServices((context, services) =>
+        builder.ConfigureServices((hostContext, services) =>
         {
+            IConfiguration configuration = hostContext.Configuration;
             services.AddSingleton<IGreeter, Greeter>();
         });
     };
@@ -64,7 +66,7 @@ class Program
     };
     
     // command line
-    static async Task Main(string[] args)
+    static async Task<int> Main(string[] args)
     {
         // todo: parse dependency settings from json file https://stackoverflow.com/questions/65110479/how-to-get-values-from-appsettings-json-in-a-console-application-using-net-core
         // and use those to configure services for DI.
@@ -97,6 +99,7 @@ class Program
             .Build();
         foreach ((string key, string value) in config.AsEnumerable().OrderBy(item => item.Key))  //Linq
             Console.WriteLine($"'{key}' = '{value}'");
+        return 0;
     }
 
     private static CommandLineBuilder BuildCommandLine()
