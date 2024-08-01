@@ -12,11 +12,12 @@ using System;
 using System.IO;
 using System.Collections;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Binder;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
-//using System.Linq;
 using HostingPlayground.CompositionRoot;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace HostingPlayground;
@@ -25,6 +26,37 @@ class Program
 {
     static async Task<int> Main(string[] args)
     {
+        // check if environment is set anywhere
+        // start with just quick configuration data from environment mainly to get DOTNET_ENVIRONMENT
+        var configBuilder = new ConfigurationBuilder();
+        var configRoot = configBuilder
+            .AddEnvironmentVariables("DOTNET_")
+            .AddCommandLine(args)
+            .Build();
+        String EnvironmentName = configRoot["ENVIRONMENT"];
+        if (String.IsNullOrEmpty(EnvironmentName))
+        { 
+            EnvironmentName = "Production";
+        };
+
+        foreach ((string key, string value) in configRoot.AsEnumerable().ToImmutableSortedDictionary())
+        {
+            Console.WriteLine($"'{key}' = '{value}'");
+        }
+
+        configRoot = configBuilder
+        .AddJsonFile(path: "appsettings.json", optional: false, reloadOnChange: false)
+        .AddJsonFile(path: $"appsettings.{EnvironmentName}.json", optional: true, reloadOnChange: false)
+        //.AddEnvironmentVariables()  // << that's ALL the env vars!
+        .AddEnvironmentVariables(prefix: "DOTNET_")  // strips the DOTNET_ from the result
+        .AddCommandLine(args)
+        .Build();
+
+        foreach ((string key, string value) in configRoot.AsEnumerable().ToImmutableSortedDictionary())
+        {
+            Console.WriteLine($"'{key}' = '{value}'");
+        }
+        
         IHostBuilder hostbuilder = HostingPlayGroundCompositionRoot.GetHostBuilder(args);
         await BuildCommandLine()
         .UseHost(args => hostbuilder, HostingPlayGroundCompositionRoot.ActionConfigureServices)
@@ -32,16 +64,8 @@ class Program
         .Build()
         .InvokeAsync(args);
 
-        IConfigurationRoot config = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .AddEnvironmentVariables()
-            .Build();
-
-        foreach ((string key, string value) in config.AsEnumerable().ToImmutableSortedDictionary())
-        {
-            Console.WriteLine($"'{key}' = '{value}'");
-        }
         return 0;
+
     }
 
     private static CommandLineBuilder BuildCommandLine()
