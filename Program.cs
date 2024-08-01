@@ -22,82 +22,15 @@ namespace HostingPlayground;
 
 class Program
 {
-
-    // for dependency injection container
-    /*
-    private static Func<string[], IHostBuilder> GetHostBuilder = delegate (string[] args)
-    {
-        return Host.CreateDefaultBuilder(args)
-        .UseDefaultServiceProvider((context, options) =>
-        {
-            options.ValidateScopes = true;
-        })
-        .ConfigureHostConfiguration((hostConfig) =>
-        {
-            hostConfig.SetBasePath(Directory.GetCurrentDirectory());
-            hostConfig.AddJsonFile("appsettings.json", optional: true);
-            //hostConfig.AddEnvironmentVariables(prefix: ""); // prefix: "PREFIX_"); // DOTNET_ by default already added
-            ;
-        })
-        .ConfigureAppConfiguration((hostContext,appConfig) =>
-        {
-            IHostEnvironment env = hostContext.HostingEnvironment;
-            Console.WriteLine($"isDevelopment: {env.IsDevelopment()}");
-            appConfig.AddCommandLine(args);
-        })
-        ;
-
-    };
-
-    private static Action<IHostBuilder> ActionConfigureAppConfiguration = delegate (IHostBuilder builder)
-    {
-        builder.ConfigureServices((hostContext, services) =>
-        {
-            IConfiguration configuration = hostContext.Configuration;
-            services.AddSingleton<IGreeter, Greeter>();
-        });
-    };
-
-
-    private static Action<IHostBuilder> ActionConfigureServices = delegate (IHostBuilder builder)
-    {
-        builder.ConfigureServices((context, services) =>
-        {
-            // moved to compositionroot
-            //services.AddSingleton<IGreeter, Greeter>();
-            services.AddServices();
-        });
-    };
-    */
-    // command line
-
     static async Task<int> Main(string[] args)
     {
-        // todo: parse dependency settings from json file https://stackoverflow.com/questions/65110479/how-to-get-values-from-appsettings-json-in-a-console-application-using-net-core
-        // and use those to configure services for DI.
-        // for consistency, follow same parsing rules as DI itself e.g. https://learn.microsoft.com/en-us/dotnet/core/extensions/generic-host?tabs=hostbuilder#host-builder-settings
-        // interweave with system.commandline.builder
-        var environmentvariables = Environment.GetEnvironmentVariables();
-        /*
-         * Console.WriteLine("GetEnvironmentVariables: ");
-        foreach (DictionaryEntry de in Environment.GetEnvironmentVariables()) 
-        {
-            Console.WriteLine("  {0} = {1}", de.Key, de.Value);
-        };
-        */
         IHostBuilder hostbuilder = HostingPlayGroundCompositionRoot.GetHostBuilder(args);
-
-        //IHost host = hostbuilder.Build();
-        //host.Services
-
-        // using (IHost host = hostbuilder.Build()) -- not needed with system.commandline: CommandLineBuilder.UseHost method implements using
-        //{
         await BuildCommandLine()
         .UseHost(args => hostbuilder, HostingPlayGroundCompositionRoot.ActionConfigureServices)
         .UseDefaults()
         .Build()
         .InvokeAsync(args);
-        //}
+
         IConfigurationRoot config = new ConfigurationBuilder()
             //.AddJsonFile("appsettings.json")
             //.AddEnvironmentVariables()
@@ -128,7 +61,6 @@ class Program
         var name = options.Name;
         logger.LogInformation(GreetEvent, "Greeting was requested for: {name}", name);
         greeter.Greet(name);
-        //Console.WriteLine(host.Services.GetService<ILoggerFactory>());
     }
 
 }
