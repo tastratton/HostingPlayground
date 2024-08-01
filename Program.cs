@@ -95,7 +95,7 @@ class Program
             //.AddJsonFile("appsettings.json")
             //.AddEnvironmentVariables()
             .Build();
-        foreach ((string key, string value) in config.AsEnumerable().OrderBy(item => item.Key))
+        foreach ((string key, string value) in config.AsEnumerable().OrderBy(item => item.Key))  //Linq
             Console.WriteLine($"'{key}' = '{value}'");
     }
 
